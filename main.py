@@ -50,5 +50,59 @@ def cari_jalur(mulai, tujuan):
 
     return (
         "DIAGNOSIS TIDAK DIKETAHUI",
+def main():
+    print("=" * 45)
+    print("          CIRCUIT  803 AI")
+    print(" Diagnosis Konektivitas Rangkaian")
+    print("=" * 45)
+
+    print("\nDaftar titik yang tersedia:")
+    for titik in rangkaian:
+        print("-", titik)
+
+    daftar_titik = {
+        titik.lower(): titik for titik in rangkaian
+    }
+
+    input_mulai = input(
+        "\nMasukkan titik awal: "
+    ).strip().lower()
+
+    input_tujuan = input(
+        "Masukkan titik tujuan: "
+    ).strip().lower()
+
+    mulai = daftar_titik.get(input_mulai)
+    tujuan = daftar_titik.get(input_tujuan)
+
+    if mulai is None or tujuan is None:
+        print("\n=== HASIL DIAGNOSIS ===")
+        print("Status: INPUT TIDAK VALID")
+        print("Saran: Gunakan nama titik yang tersedia.")
+        return
+
+    hasil = cari_jalur(mulai, tujuan)
+
+    status, saran = diagnosis(hasil)
+
+    print("\n" + "=" * 45)
+    print("             HASIL DIAGNOSIS")
+    print("=" * 45)
+
+    print("Titik awal :", mulai)
+    print("Titik tujuan:", tujuan)
+    print("Status     :", status)
+    print("Saran      :", saran)
+
+    if hasil is not None:
+        print("Jalur      :", " -> ".join(hasil))
+    else:
+        print("Jalur      : Tidak ditemukan")
+
+    print("=" * 45)
+
+
+if __name__ == "__main__":
+    main()
         "Periksa kembali model rangkaian."
     )
