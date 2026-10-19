@@ -1,8 +1,12 @@
 
 from collections import deque
 
+# ==========================================
+# CIRCUITPATH SSF AI
+# SEARCH ALGORITHM: BREADTH-FIRST SEARCH
+# ==========================================
 
-rangkaian = {
+RANGKAIAN = {
     "Baterai+": ["R1"],
     "R1": ["Baterai+", "LED1"],
     "LED1": ["R1", "GND"],
@@ -11,111 +15,44 @@ rangkaian = {
 }
 
 
+def cari_jalur(titik_awal, titik_tujuan):
+    """Mencari jalur terpendek menggunakan BFS."""
 
-def cari_jalur(mulai, tujuan):
-    antrean = deque([[mulai]])
-    dikunjungi = {mulai}
+    if titik_awal not in RANGKAIAN:
+        return None
 
-    while antrean:
-        jalur = antrean.popleft()
-        titik = jalur[-1]
+    if titik_tujuan not in RANGKAIAN:
+        return None
 
-        
-        if titik == tujuan:
+    antrian = deque([[titik_awal]])
+    dikunjungi = {titik_awal}
+
+    while antrian:
+        jalur = antrian.popleft()
+        titik_sekarang = jalur[-1]
+
+        if titik_sekarang == titik_tujuan:
             return jalur
 
-        
-        for tetangga in rangkaian.get(titik, []):
+        for tetangga in RANGKAIAN[titik_sekarang]:
             if tetangga not in dikunjungi:
                 dikunjungi.add(tetangga)
-                antrean.append(jalur + [tetangga])
+                antrian.append(jalur + [tetangga])
 
-    return None
-
-
-
-def diagnosis(jalur):
-    aturan = [
-        {
-            "kondisi": lambda hasil: hasil is not None,
-            "status": "TERHUBUNG DALAM MODEL",
-            "saran": "Jalur koneksi berhasil ditemukan."
-        },
-        {
-            "kondisi": lambda hasil: hasil is None,
-            "status": "TIDAK TERHUBUNG DALAM MODEL",
-            "saran": "Periksa kembali hubungan antartitik."
-        }
-    ]
-
-    for aturan_pakar in aturan:
-        if aturan_pakar["kondisi"](jalur):
-            return (
-                aturan_pakar["status"],
-                aturan_pakar["saran"]
-            )
-
-    return (
-        "DIAGNOSIS TIDAK DIKETAHUI",
-        "Periksa kembali model rangkaian."
-    )
-
-
-
-def main():
-    print("=" * 45)
-    print("          CIRCUIT 803 AI")
-    print(" Diagnosis Konektivitas Rangkaian")
-    print("=" * 45)
-
-    print("\nDaftar titik yang tersedia:")
-    for titik in rangkaian:
-        print("-", titik)
-
-    
-    daftar_titik = {
-        titik.lower(): titik for titik in rangkaian
-    }
-
-    input_mulai = input(
-        "\nMasukkan titik awal: "
-    ).strip().lower()
-
-    input_tujuan = input(
-        "Masukkan titik tujuan: "
-    ).strip().lower()
-
-    mulai = daftar_titik.get(input_mulai)
-    tujuan = daftar_titik.get(input_tujuan)
-
-   
-    if mulai is None or tujuan is None:
-        print("\n=== HASIL DIAGNOSIS ===")
-        print("Status : INPUT TIDAK VALID")
-        print("Saran  : Gunakan nama titik yang tersedia.")
-        return
-
-    
-    hasil = cari_jalur(mulai, tujuan)
-    status, saran = diagnosis(hasil)
-
-    
-    print("\n" + "=" * 45)
-    print("             HASIL DIAGNOSIS")
-    print("=" * 45)
-
-    print("Titik awal  :", mulai)
-    print("Titik tujuan:", tujuan)
-    print("Status      :", status)
-    print("Saran       :", saran)
-
-    if hasil is not None:
-        print("Jalur       :", " -> ".join(hasil))
-    else:
-        print("Jalur       : Tidak ditemukan")
-
-    print("=" * 45)
+    return []
 
 
 if __name__ == "__main__":
-    main()
+    print("=== CIRCUITPATH SSF AI ===")
+
+    awal = input("Titik awal: ").strip()
+    tujuan = input("Titik tujuan: ").strip()
+
+    hasil = cari_jalur(awal, tujuan)
+
+    if hasil is None:
+        print("Input tidak valid.")
+    elif hasil:
+        print("Jalur ditemukan:", " -> ".join(hasil))
+    else:
+        print("Jalur tidak ditemukan.")
