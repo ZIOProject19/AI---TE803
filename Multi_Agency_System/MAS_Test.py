@@ -1,94 +1,81 @@
 
 # ==========================================
 # CIRCUITPATH SSF AI
-# MULTI-AGENT SYSTEM
+# MODUL: MULTI-AGENT SYSTEM
 # ==========================================
 
-from search_algorithm import cari_jalur, RANGKAIAN
-from expert_system import diagnosis
+from Search_Algorthm.BFS_Test import cari_jalur
+from Expert_System.IF_THEN_Tets import diagnosis
 
 
 class SearchAgent:
-    """Agen pencari jalur koneksi."""
+    """Agen untuk mencari jalur koneksi."""
 
-    def bekerja(self, awal, tujuan):
-        jalur = cari_jalur(awal, tujuan)
-
-        return {
-            "nama_agen": "Search Agent",
-            "jalur": jalur
-        }
+    def jalankan(self, titik_awal, titik_tujuan):
+        print("\n[Search Agent] Mencari jalur...")
+        return cari_jalur(titik_awal, titik_tujuan)
 
 
 class ConnectionAnalysisAgent:
-    """Agen analisis konektivitas."""
+    """Agen untuk menganalisis hasil pencarian."""
 
-    def bekerja(self, awal, tujuan, jalur):
-        if awal not in RANGKAIAN or tujuan not in RANGKAIAN:
-            status = "INPUT TIDAK VALID"
-            jumlah_titik = 0
+    def jalankan(self, jalur):
+        print("[Connection Analysis Agent] Menganalisis hasil...")
 
-        elif awal == tujuan:
-            status = "TITIK SAMA"
-            jumlah_titik = 1
-
+        if jalur is None:
+            return "Input tidak valid"
         elif jalur:
-            status = "JALUR DITEMUKAN"
-            jumlah_titik = len(jalur)
-
+            return "Jalur ditemukan"
         else:
-            status = "JALUR TIDAK DITEMUKAN"
-            jumlah_titik = 0
-
-        return {
-            "nama_agen": "Connection Analysis Agent",
-            "status": status,
-            "jumlah_titik": jumlah_titik
-        }
+            return "Jalur tidak ditemukan"
 
 
 class DiagnosisAgent:
-    """Agen diagnosis berbasis sistem pakar."""
+    """Agen untuk menjalankan sistem pakar."""
 
-    def bekerja(self, awal, tujuan, jalur):
-        hasil = diagnosis(awal, tujuan, jalur)
-
-        return {
-            "nama_agen": "Diagnosis Agent",
-            "hasil": hasil
-        }
+    def jalankan(self, titik_awal, titik_tujuan, jalur):
+        print("[Diagnosis Agent] Menentukan diagnosis...")
+        return diagnosis(titik_awal, titik_tujuan, jalur)
 
 
 class MultiAgentSystem:
-    """Koordinator kerja sama antaragen."""
+    """Koordinator agen CircuitPath SSF AI."""
 
     def __init__(self):
         self.search_agent = SearchAgent()
         self.analysis_agent = ConnectionAnalysisAgent()
         self.diagnosis_agent = DiagnosisAgent()
 
-    def jalankan(self, awal, tujuan):
-        # Agen 1: mencari jalur
-        hasil_pencarian = self.search_agent.bekerja(
-            awal, tujuan
+    def jalankan(self, titik_awal, titik_tujuan):
+        jalur = self.search_agent.jalankan(
+            titik_awal, titik_tujuan
         )
 
-        jalur = hasil_pencarian["jalur"]
+        analisis = self.analysis_agent.jalankan(jalur)
 
-        # Agen 2: menganalisis konektivitas
-        hasil_analisis = self.analysis_agent.bekerja(
-            awal, tujuan, jalur
+        hasil_diagnosis = self.diagnosis_agent.jalankan(
+            titik_awal, titik_tujuan, jalur
         )
 
-        # Agen 3: melakukan diagnosis
-        hasil_diagnosis = self.diagnosis_agent.bekerja(
-            awal, tujuan, jalur
-        )
-
-        # Menggabungkan hasil ketiga agen
         return {
-            "pencarian": hasil_pencarian,
-            "analisis": hasil_analisis,
-            "diagnosis": hasil_diagnosis["hasil"]
+            "jalur": jalur,
+            "analisis": analisis,
+            "diagnosis": hasil_diagnosis
         }
 
+
+# ==========================================
+# PENGUJIAN MANDIRI
+# ==========================================
+
+if __name__ == "__main__":
+    sistem = MultiAgentSystem()
+
+    hasil = sistem.jalankan("Baterai+", "LED1")
+
+    print("\n=== HASIL CIRCUITPATH SSF AI ===")
+    print("Jalur     :", hasil["jalur"])
+    print("Analisis  :", hasil["analisis"])
+    print("Status    :", hasil["diagnosis"]["status"])
+    print("Penjelasan:", hasil["diagnosis"]["penjelasan"])
+    print("Saran     :", hasil["diagnosis"]["saran"])
