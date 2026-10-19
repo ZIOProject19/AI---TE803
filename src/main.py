@@ -1,120 +1,66 @@
 
-from collections import deque
+# ==========================================
+# CIRCUITPATH SSF AI
+# MAIN PROGRAM
+# ==========================================
 
-
-rangkaian = {
-    "Baterai+": ["R1"],
-    "R1": ["Baterai+", "LED1"],
-    "LED1": ["R1", "GND"],
-    "GND": ["LED1"],
-    "SENSOR": []
-}
-
-
-
-def cari_jalur(mulai, tujuan):
-    antrean = deque([[mulai]])
-    dikunjungi = {mulai}
-
-    while antrean:
-        jalur = antrean.popleft()
-        titik = jalur[-1]
-
-        
-        if titik == tujuan:
-            return jalur
-
-        
-        for tetangga in rangkaian.get(titik, []):
-            if tetangga not in dikunjungi:
-                dikunjungi.add(tetangga)
-                antrean.append(jalur + [tetangga])
-
-    return None
-
-
-
-def diagnosis(jalur):
-    aturan = [
-        {
-            "kondisi": lambda hasil: hasil is not None,
-            "status": "TERHUBUNG DALAM MODEL",
-            "saran": "Jalur koneksi berhasil ditemukan."
-        },
-        {
-            "kondisi": lambda hasil: hasil is None,
-            "status": "TIDAK TERHUBUNG DALAM MODEL",
-            "saran": "Periksa kembali hubungan antartitik."
-        }
-    ]
-
-    for aturan_pakar in aturan:
-        if aturan_pakar["kondisi"](jalur):
-            return (
-                aturan_pakar["status"],
-                aturan_pakar["saran"]
-            )
-
-    return (
-        "DIAGNOSIS TIDAK DIKETAHUI",
-        "Periksa kembali model rangkaian."
-    )
-
+from search_algorithm import RANGKAIAN
+from multi_agent_system import MultiAgentSystem
 
 
 def main():
-    print("=" * 45)
-    print("          CIRCUIT 803 AI")
-    print(" Diagnosis Konektivitas Rangkaian")
-    print("=" * 45)
+    sistem = MultiAgentSystem()
 
-    print("\nDaftar titik yang tersedia:")
-    for titik in rangkaian:
-        print("-", titik)
+    print("=" * 60)
+    print("          CIRCUITPATH SSF AI")
+    print(" Search Algorithm | Expert System | Multi-Agent System")
+    print("=" * 60)
 
-    
-    daftar_titik = {
-        titik.lower(): titik for titik in rangkaian
-    }
+    print("\nDaftar titik koneksi:")
+    for titik in RANGKAIAN:
+        print(f"- {titik}")
 
-    input_mulai = input(
-        "\nMasukkan titik awal: "
-    ).strip().lower()
+    print("\nMasukkan titik koneksi yang ingin diperiksa.")
+    awal = input("Titik awal: ").strip()
+    tujuan = input("Titik tujuan: ").strip()
 
-    input_tujuan = input(
-        "Masukkan titik tujuan: "
-    ).strip().lower()
+    hasil = sistem.jalankan(awal, tujuan)
 
-    mulai = daftar_titik.get(input_mulai)
-    tujuan = daftar_titik.get(input_tujuan)
+    print("\n" + "=" * 60)
+    print("HASIL ANALISIS CIRCUITPATH SSF AI")
+    print("=" * 60)
 
-   
-    if mulai is None or tujuan is None:
-        print("\n=== HASIL DIAGNOSIS ===")
-        print("Status : INPUT TIDAK VALID")
-        print("Saran  : Gunakan nama titik yang tersedia.")
-        return
+    # Hasil Search Algorithm
+    print("\n[1] SEARCH AGENT")
+    jalur = hasil["pencarian"]["jalur"]
 
-    
-    hasil = cari_jalur(mulai, tujuan)
-    status, saran = diagnosis(hasil)
-
-    
-    print("\n" + "=" * 45)
-    print("             HASIL DIAGNOSIS")
-    print("=" * 45)
-
-    print("Titik awal  :", mulai)
-    print("Titik tujuan:", tujuan)
-    print("Status      :", status)
-    print("Saran       :", saran)
-
-    if hasil is not None:
-        print("Jalur       :", " -> ".join(hasil))
+    if jalur is None:
+        print("Status pencarian: Input tidak valid.")
+    elif jalur:
+        print("Jalur:", " -> ".join(jalur))
     else:
-        print("Jalur       : Tidak ditemukan")
+        print("Jalur tidak ditemukan.")
 
-    print("=" * 45)
+    # Hasil Connection Analysis Agent
+    print("\n[2] CONNECTION ANALYSIS AGENT")
+    analisis = hasil["analisis"]
+
+    print("Status:", analisis["status"])
+    print("Jumlah titik:", analisis["jumlah_titik"])
+
+    # Hasil Expert System melalui Diagnosis Agent
+    print("\n[3] DIAGNOSIS AGENT / EXPERT SYSTEM")
+    hasil_diagnosis = hasil["diagnosis"]
+
+    print("Aturan:", hasil_diagnosis["aturan"])
+    print("Diagnosis:", hasil_diagnosis["status"])
+    print("Penjelasan:", hasil_diagnosis["penjelasan"])
+    print("Saran:", hasil_diagnosis["saran"])
+
+    print("\n" + "=" * 60)
+    print("Analisis selesai.")
+    print("Terima kasih telah menggunakan CircuitPath SSF AI.")
+    print("=" * 60)
 
 
 if __name__ == "__main__":
